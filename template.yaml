@@ -1,42 +1,87 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  gpt_vdi
-
-  Sample SAM Template for gpt_vdi
-
-
-Globals:
-  Function:
-    Timeout: 3
-    MemorySize: 128
+  SAM Template for Lambda Function, S3 Bucket for Static File Hosting via CloudFront, and API Gateway
 
 Resources:
-  GPTFunction:
-    Type: AWS::Serverless::Function 
+  
+  # Lambda function for handling prompt and AI generation
+  PromptLambdaFunction:
+    Type: AWS::Serverless::Function
     Properties:
-      CodeUri: gpt/
       Handler: app.lambda_handler
       Runtime: python3.9
-      Architectures:
-        - x86_64
+      CodeUri: ./src
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          GENAI_API_KEY: YOUR_GOOGLE_API_KEY
       Events:
-        GPT:
-          Type: Api 
+        ApiGateway:
+          Type: Api
           Properties:
-            Path: /gpt
-            Method: get
+            Path: /prompt
+            Method: POST
+
+  # S3 Bucket for hosting static content (not configured as website)
+  StaticSiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'static-site-${AWS::Region}-${AWS::AccountId}'
+
+  # Origin Access Identity for CloudFront to access the S3 bucket
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub 'Access S3 bucket ${StaticSiteBucket} from CloudFront'
+
+  # CloudFront distribution for serving static files from S3
+  StaticSiteCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !GetAtt StaticSiteBucket.RegionalDomainName
+            Id: S3Origin
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+        Enabled: true
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: 
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+        DefaultRootObject: index.html
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+
+  # Bucket Policy to allow CloudFront to access the S3 bucket
+  StaticSiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref StaticSiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+            Action: s3:GetObject
+            Resource: !Sub 'arn:aws:s3:::${StaticSiteBucket}/*'
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  GPTApi:
-    Description: "API Gateway endpoint URL for Prod stage for GPT function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/gpt/"
-  GPTFunction:
-    Description: "GPT Lambda Function ARN"
-    Value: !GetAtt GPTFunction.Arn
-  GPTFunctionIamRole:
-    Description: "Implicit IAM Role created for GPT function"
-    Value: !GetAtt GPTFunctionRole.Arn
+  # Output for Lambda Function API Gateway URL
+  PromptLambdaFunctionApi:
+    Description: "API Gateway endpoint URL for Prod stage for the Prompt Lambda Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/prompt/"
+    
+  # Output for CloudFront URL to access static files
+  StaticSiteCloudFrontURL:
+    Description: "CloudFront URL for the static site"
+    Value: !Sub "https://${StaticSiteCloudFrontDistribution.DomainName}"
