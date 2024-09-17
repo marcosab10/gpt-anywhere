@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  gpt_vdi
+
+  Sample SAM Template for gpt_vdi
+
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  GPTFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: gpt/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        GPT:
+          Type: Api 
+          Properties:
+            Path: /gpt
+            Method: get
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  GPTApi:
+    Description: "API Gateway endpoint URL for Prod stage for GPT function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/gpt/"
+  GPTFunction:
+    Description: "GPT Lambda Function ARN"
+    Value: !GetAtt GPTFunction.Arn
+  GPTFunctionIamRole:
+    Description: "Implicit IAM Role created for GPT function"
+    Value: !GetAtt GPTFunctionRole.Arn
