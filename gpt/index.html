@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Fine-Tuning an LLM on Amazon SageMaker</title>
+    <style>
+        body {
+            font-family: Amazon Ember, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        .box {
+            background: #fff;
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .box label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .box input[type="text"],
+        .box textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+        }
+
+        .box button {
+            padding: 10px 20px;
+            background: #009578;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        h2,
+        h5 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Fine-Tuning an LLM on Amazon SageMaker</h2>
+        <div id="apiForm" class="box">
+            <label for="apiGatewayUrl">API Gateway URL:</label>
+            <input type="text" id="apiGatewayUrl">
+            <label for="content">Prompt:</label>
+            <textarea id="content" rows="10"></textarea>
+            <button onclick="callApi()">Generate</button>
+        </div>
+        <div id="response" class="box">
+            <label for="output">Output:</label>
+            <textarea id="output" rows="10" readonly></textarea>
+        </div>
+        <h5><i>Please note: As with all AI-powered applications, outputs should be reviewed for accuracy and appropriateness.</i></h5>
+    </div>
+    <script>
+        function callApi() {
+            const apiGatewayUrl = document.getElementById('apiGatewayUrl').value;
+            const content = document.getElementById('content').value;
+
+            fetch(apiGatewayUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ inputs: content, parameters: { 'max_new_tokens': 400 } })
+            })
+            .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! status: ${response.status}`))
+            .then(data => {
+                let outputText = data;
+
+                // Remove quotes at the start and end of the string
+                if (outputText[0] === '"' && outputText[outputText.length - 1] === '"') {
+                    outputText = outputText.substring(1, outputText.length - 1);
+                }
+
+                // Decode any Unicode escape sequences
+                try {
+                    outputText = JSON.parse('"' + outputText + '"');
+                } catch(e) {
+                    console.error("Error decoding escape sequences:", e);
+                }
+
+                document.getElementById('output').value = outputText;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error);
+            });
+        }
+
+    </script>
+</body>
+
+</html>
