@@ -5,49 +5,7 @@ Description: >
 
 Resources:
   
-  # Lambda function for handling prompt and AI generation
-  PromptLambdaFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: app.lambda_handler
-      Runtime: python3.11
-      CodeUri: gpt
-      MemorySize: 128
-      Timeout: 30
-      Environment:
-        Variables:
-          GENAI_API_KEY: !Ref GoogleApiKey
-      Events:
-        ApiGateway:
-          Type: Api
-          Properties:
-            Path: /prompt
-            Method: POST
-
-  # API Key for Google AI (Stored in Parameter Store)
-  GoogleApiKey:
-    Type: AWS::SSM::Parameter
-    Properties: 
-      Name: /google/genai/api-key
-      Type: String
-      Value: "YOUR_GOOGLE_API_KEY"  # replace with actual value
-
-  # Lambda function for uploading static content to S3
-  UploadStaticContentLambdaFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: upload_static_content.lambda_handler
-      Runtime: python3.11
-      CodeUri: gpt
-      MemorySize: 128
-      Timeout: 30
-      Policies:
-        - S3WritePolicy:
-            BucketName: !Ref StaticSiteBucket
-      Environment:
-        Variables:
-          BUCKET_NAME: !Ref StaticSiteBucket
-
+ 
   # S3 Bucket for hosting static content (not configured as website)
   StaticSiteBucket:
     Type: AWS::S3::Bucket
@@ -58,14 +16,6 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
-
-  # Custom resource to trigger Lambda upload function during deployment
-  UploadStaticContentCustomResource:
-    Type: Custom::UploadStaticContent
-    Properties:
-      ServiceToken: !GetAtt UploadStaticContentLambdaFunction.Arn
-      BucketName: !Ref StaticSiteBucket
-      SourcePath: 'gpt/index.html'
 
   # Origin Access Identity for CloudFront to access the S3 bucket
   CloudFrontOriginAccessIdentity:
@@ -129,7 +79,7 @@ Resources:
           title: 'Prompt API'
           version: '1.0'
         paths:
-          /prompt:
+          /:
             post:
               summary: 'Invoke Lambda function with a prompt'
               consumes:
@@ -175,6 +125,26 @@ Resources:
               - Effect: Allow
                 Action: lambda:InvokeFunction
                 Resource: !GetAtt PromptLambdaFunction.Arn
+
+  # Lambda function for handling prompt and AI generation
+  PromptLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: python3.11
+      CodeUri: gpt
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          GENAI_API_KEY: "YOUR_GOOGLE_API_KEY"
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+            RestApiId: !Ref ApiGateway
 
 Outputs:
   # Output for Lambda Function API Gateway URL
