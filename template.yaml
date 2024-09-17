@@ -107,7 +107,7 @@ Resources:
                   headers:
                     Access-Control-Allow-Origin:
                       type: string
-                      default: "'*'"  # Permitir qualquer origem, ou substitua pelo domínio específico
+                      default: "'*'"
                     Access-Control-Allow-Methods:
                       type: string
                       default: "'POST, OPTIONS'"
@@ -116,7 +116,7 @@ Resources:
                       default: "'Content-Type'"
                     Content-Type:
                       type: string
-                      default: "'application/json'"  # Definindo o Content-Type como application/json
+                      default: "'application/json'"
             options:
               summary: 'CORS support'
               consumes:
@@ -138,7 +138,7 @@ Resources:
                       default: "'Content-Type'"
                     Content-Type:
                       type: string
-                      default: "'application/json'"  # Definindo o Content-Type como application/json
+                      default: "'application/json'"
               x-amazon-apigateway-integration:
                 type: mock
                 requestTemplates:
@@ -150,7 +150,7 @@ Resources:
                       method.response.header.Access-Control-Allow-Methods: "'POST, OPTIONS'"
                       method.response.header.Access-Control-Allow-Headers: "'Content-Type'"
                       method.response.header.Access-Control-Allow-Origin: "'*'"
-                      method.response.header.Content-Type: "'application/json'"  # Definindo o Content-Type como application/json
+                      method.response.header.Content-Type: "'application/json'"
 
 
 
