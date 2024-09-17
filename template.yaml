@@ -10,7 +10,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.11
       CodeUri: gpt
       MemorySize: 128
       Timeout: 30
@@ -37,7 +37,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: upload_static_content.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.11
       CodeUri: gpt
       MemorySize: 128
       Timeout: 30

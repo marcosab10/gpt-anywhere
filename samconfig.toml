@@ -4,7 +4,7 @@ version = 0.1
 
 [default]
 [default.global.parameters]
-stack_name = "gpt_vdi"
+stack_name = "gpt-vdi"
 
 [default.build.parameters]
 cached = true
