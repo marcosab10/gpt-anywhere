@@ -77,12 +77,17 @@
             const apiGatewayUrl = document.getElementById('apiGatewayUrl').value;
             const content = document.getElementById('content').value;
 
+            // Construindo o corpo do JSON no formato desejado
+            const requestBody = JSON.stringify({
+                prompt: content
+            });
+
             fetch(apiGatewayUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ inputs: content, parameters: { 'max_new_tokens': 400 } })
+                body: requestBody
             })
             .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! status: ${response.status}`))
             .then(data => {
