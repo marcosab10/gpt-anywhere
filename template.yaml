@@ -91,9 +91,14 @@ Resources:
           AllowedMethods: 
             - GET
             - HEAD
+            - OPTIONS
           CachedMethods:
             - GET
             - HEAD
+          ForwardedValues:
+            QueryString: false  
+            Cookies:
+              Forward: none     
         DefaultRootObject: index.html
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
