@@ -76,17 +76,17 @@
         function callApi() {
             const apiGatewayUrl = document.getElementById('apiGatewayUrl').value;
             const content = document.getElementById('content').value;
-
+    
             if (!apiGatewayUrl) {
                 alert("Please provide the API Gateway URL.");
                 return;
             }
-
+    
             // Construindo o corpo do JSON no formato desejado
             const requestBody = JSON.stringify({
                 prompt: content
             });
-
+    
             fetch(apiGatewayUrl, {
                 method: 'POST',
                 headers: {
@@ -97,7 +97,10 @@
             .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! status: ${response.status}`))
             .then(data => {
                 let outputText = data.message;  // Extrair a mensagem do JSON retornado
-
+    
+                // Converter quebras de linha escapadas para quebras reais
+                outputText = outputText.replace(/\\n/g, '\n');
+    
                 // Exibir o resultado no textarea de saída
                 document.getElementById('output').value = outputText;
             })
@@ -106,8 +109,7 @@
                 alert('An error occurred: ' + error);
             });
         }
-
-    </script>
+    </script>    
 </body>
 
 </html>

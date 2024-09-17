@@ -114,6 +114,9 @@ Resources:
                     Access-Control-Allow-Headers:
                       type: string
                       default: "'Content-Type'"
+                    Content-Type:
+                      type: string
+                      default: "'application/json'"  # Definindo o Content-Type como application/json
             options:
               summary: 'CORS support'
               consumes:
@@ -133,6 +136,9 @@ Resources:
                     Access-Control-Allow-Headers:
                       type: string
                       default: "'Content-Type'"
+                    Content-Type:
+                      type: string
+                      default: "'application/json'"  # Definindo o Content-Type como application/json
               x-amazon-apigateway-integration:
                 type: mock
                 requestTemplates:
@@ -144,6 +150,8 @@ Resources:
                       method.response.header.Access-Control-Allow-Methods: "'POST, OPTIONS'"
                       method.response.header.Access-Control-Allow-Headers: "'Content-Type'"
                       method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Content-Type: "'application/json'"  # Definindo o Content-Type como application/json
+
 
 
   # IAM Role for API Gateway to invoke Lambda function
@@ -191,7 +199,7 @@ Outputs:
   # Output for Lambda Function API Gateway URL
   PromptLambdaFunctionApi:
     Description: "API Gateway endpoint URL for Prod stage for the Prompt Lambda Function"
-    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/prompt/"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
     
   # Output for CloudFront URL to access static files
   StaticSiteCloudFrontURL:
