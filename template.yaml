@@ -16,7 +16,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          GENAI_API_KEY: YOUR_GOOGLE_API_KEY
+          GENAI_API_KEY: !Ref GoogleApiKey
       Events:
         ApiGateway:
           Type: Api
@@ -24,11 +24,24 @@ Resources:
             Path: /prompt
             Method: POST
 
+  # API Key for Google AI (Stored in Parameter Store)
+  GoogleApiKey:
+    Type: AWS::SSM::Parameter
+    Properties: 
+      Name: /google/genai/api-key
+      Type: String
+      Value: "YOUR_GOOGLE_API_KEY"  # replace with actual value
+
   # S3 Bucket for hosting static content (not configured as website)
   StaticSiteBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub 'static-site-${AWS::Region}-${AWS::AccountId}'
+      PublicAccessBlockConfiguration: 
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
   # Origin Access Identity for CloudFront to access the S3 bucket
   CloudFrontOriginAccessIdentity:
@@ -75,11 +88,70 @@ Resources:
             Action: s3:GetObject
             Resource: !Sub 'arn:aws:s3:::${StaticSiteBucket}/*'
 
+  # API Gateway REST API
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: PromptApi
+      StageName: Prod
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title: 'Prompt API'
+          version: '1.0'
+        paths:
+          /prompt:
+            post:
+              summary: 'Invoke Lambda function with a prompt'
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              parameters:
+                - name: prompt
+                  in: body
+                  required: true
+                  schema:
+                    type: object
+                    properties:
+                      prompt:
+                        type: string
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PromptLambdaFunction.Arn}/invocations
+                passthroughBehavior: when_no_match
+                contentHandling: CONVERT_TO_TEXT
+              responses:
+                '200':
+                  description: 'Successful response'
+
+  # IAM Role for API Gateway to invoke Lambda function
+  ApiGatewayExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: ApiGatewayInvokeLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt PromptLambdaFunction.Arn
+
 Outputs:
   # Output for Lambda Function API Gateway URL
   PromptLambdaFunctionApi:
     Description: "API Gateway endpoint URL for Prod stage for the Prompt Lambda Function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/prompt/"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/prompt/"
     
   # Output for CloudFront URL to access static files
   StaticSiteCloudFrontURL:
