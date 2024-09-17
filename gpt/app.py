@@ -14,8 +14,15 @@ def lambda_handler(event, context):
     # Configurar a chave da API
     genai.configure(api_key=api_key)
 
-    # Extrair o prompt do evento, com um valor padrão caso não seja fornecido
-    prompt = event.get("prompt", "Escreva extamente a mensagem: 'Em que posso ajudar?'")
+    # Extrair o corpo da requisição e fazer o parsing do JSON
+    try:
+        body = json.loads(event.get("body", "{}"))
+        prompt = body.get("prompt", "Escreva extamente a mensagem: 'Em que posso ajudar?'")
+    except json.JSONDecodeError:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"error": "Invalid JSON in request body"})
+        }
 
     try:
         # Usar o modelo para gerar o conteúdo

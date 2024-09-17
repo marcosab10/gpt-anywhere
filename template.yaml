@@ -87,7 +87,7 @@ Resources:
               produces:
                 - application/json
               parameters:
-                - name: prompt
+                - name: body
                   in: body
                   required: true
                   schema:
@@ -104,6 +104,47 @@ Resources:
               responses:
                 '200':
                   description: 'Successful response'
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                      default: "'*'"  # Permitir qualquer origem, ou substitua pelo domínio específico
+                    Access-Control-Allow-Methods:
+                      type: string
+                      default: "'POST, OPTIONS'"
+                    Access-Control-Allow-Headers:
+                      type: string
+                      default: "'Content-Type'"
+            options:
+              summary: 'CORS support'
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              responses:
+                '200':
+                  description: 'CORS response'
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                      default: "'*'"
+                    Access-Control-Allow-Methods:
+                      type: string
+                      default: "'POST, OPTIONS'"
+                    Access-Control-Allow-Headers:
+                      type: string
+                      default: "'Content-Type'"
+              x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                  application/json: '{"statusCode": 200}'
+                responses:
+                  default:
+                    statusCode: '200'
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'POST, OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+
 
   # IAM Role for API Gateway to invoke Lambda function
   ApiGatewayExecutionRole:

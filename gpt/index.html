@@ -77,6 +77,11 @@
             const apiGatewayUrl = document.getElementById('apiGatewayUrl').value;
             const content = document.getElementById('content').value;
 
+            if (!apiGatewayUrl) {
+                alert("Please provide the API Gateway URL.");
+                return;
+            }
+
             // Construindo o corpo do JSON no formato desejado
             const requestBody = JSON.stringify({
                 prompt: content
@@ -91,20 +96,9 @@
             })
             .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! status: ${response.status}`))
             .then(data => {
-                let outputText = data;
+                let outputText = data.message;  // Extrair a mensagem do JSON retornado
 
-                // Remove quotes at the start and end of the string
-                if (outputText[0] === '"' && outputText[outputText.length - 1] === '"') {
-                    outputText = outputText.substring(1, outputText.length - 1);
-                }
-
-                // Decode any Unicode escape sequences
-                try {
-                    outputText = JSON.parse('"' + outputText + '"');
-                } catch(e) {
-                    console.error("Error decoding escape sequences:", e);
-                }
-
+                // Exibir o resultado no textarea de saída
                 document.getElementById('output').value = outputText;
             })
             .catch(error => {
