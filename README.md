@@ -1,8 +1,36 @@
 # GPT Anywhere
 
+## Guia rápido de utilização
+
+Para usar a SAM CLI, você precisa das seguintes ferramentas:
+
+* **SAM CLI** - [Instalar a SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+* **Python 3.11 instalado** - [Baixar Python](https://www.python.org/downloads/)
+* **Docker (opcional)** - [Instalar a edição comunitária do Docker](https://hub.docker.com/search/?type=edition&offering=community)
+
+Na pasta do projeto executar:
+
+```
+$ aws configure
+
+$ sam build; sam deploy
+```
+
+* Com isso irá obter como saída o endpoint do API Gateway  
+Exemplo: https://utbppwr2uk.execute-api.us-east-2.amazonaws.com/Prod/
+
+* E o link do CloudFront para o site estático exemplo: https://d36uoj13cjssno.cloudfront.net
+
+* Precisa configurar a variável de ambiente `GENAI_API_KEY` nas propriedades da função lambda criada, informando a API KEY do Google AI.
+
+* Realizar o upload do arquivo `index.html` no bucket S3 que inicia com o nome `static-site-XXXXX`
+
+* Ao carregar o site estático deve informar o endpoint do API Gateway no primeiro campo e então é só usar :)
+
+
 Este projeto contém o código-fonte e arquivos de suporte para uma aplicação *serverless* que você pode implantar com a SAM CLI. Ele inclui os seguintes arquivos e pastas:
 
-- **gpt** - Código para a função Lambda da aplicação.
+- **gpt** - Código para a função Lambda da aplicação e index.html para o site estático
 - **events** - Eventos de invocação que você pode usar para invocar a função.
 - **tests** - Testes unitários para o código da aplicação.
 - **template.yaml** - Um modelo que define os recursos AWS da aplicação.
@@ -13,11 +41,7 @@ A aplicação usa vários recursos da AWS, incluindo funções Lambda e uma API 
 
 A Interface de Linha de Comando do Modelo de Aplicação *Serverless* (SAM CLI) é uma extensão da AWS CLI que adiciona funcionalidade para criar e testar aplicações Lambda. Ela usa o Docker para executar suas funções em um ambiente Amazon Linux que corresponde ao Lambda. Também pode emular o ambiente de criação da sua aplicação e a API.
 
-Para usar a SAM CLI, você precisa das seguintes ferramentas:
 
-* **SAM CLI** - [Instalar a SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-* **Python 3.11 instalado** - [Baixar Python](https://www.python.org/downloads/)
-* **Docker** - [Instalar a edição comunitária do Docker](https://hub.docker.com/search/?type=edition&offering=community)
 
 Para criar e implantar sua aplicação pela primeira vez, execute o seguinte no seu terminal:
 
@@ -73,8 +97,8 @@ A SAM CLI lê o modelo da aplicação para determinar as rotas da API e as funç
         GPT:
           Type: Api
           Properties:
-            Path: /gpt
-            Method: get
+            Path: /
+            Method: post
 ```
 
 ## Adicionar um recurso à sua aplicação

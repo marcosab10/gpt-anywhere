@@ -232,7 +232,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          GENAI_API_KEY: "COLE_AQUI_SUA_GOOGLE_API_KEY"
+          GENAI_API_KEY: "COLE_AQUI_SUA_API_KEY_DO_GOOGLE"
       Events:
         Api:
           Type: Api
