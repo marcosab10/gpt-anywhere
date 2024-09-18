@@ -167,37 +167,6 @@ Resources:
                       method.response.header.Content-Type: "'application/json'"
 
   #############################################################################################################
-  ##  API Gateway Rate Limiting
-  #############################################################################################################
-
-  ApiGatewayUsagePlan:
-    Type: AWS::ApiGateway::UsagePlan
-    Properties: 
-      UsagePlanName: PromptApiUsagePlan
-      ApiStages: 
-        - ApiId: !Ref ApiGateway
-          Stage: Prod
-      Throttle: 
-        BurstLimit: 5  # Número máximo de requisições em rajadas
-        RateLimit: 2    # Número máximo de requisições por segundo
-
-  ApiGatewayApiKey:
-    Type: AWS::ApiGateway::ApiKey
-    Properties: 
-      Name: PromptApiKey
-      Enabled: true
-      StageKeys:
-        - RestApiId: !Ref ApiGateway
-          StageName: Prod
-
-  ApiGatewayUsagePlanKey:
-    Type: AWS::ApiGateway::UsagePlanKey
-    Properties: 
-      KeyId: !Ref ApiGatewayApiKey
-      KeyType: API_KEY
-      UsagePlanId: !Ref ApiGatewayUsagePlan
-
-  #############################################################################################################
   ##  IAM Role for API Gateway to invoke Lambda function
   #############################################################################################################
  

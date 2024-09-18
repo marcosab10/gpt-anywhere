@@ -25,7 +25,9 @@ Exemplo: https://utbppwr2uk.execute-api.us-east-2.amazonaws.com/Prod/
 
 * Realizar o upload do arquivo `index.html` no bucket S3 que inicia com o nome `static-site-XXXXX`
 
-* Ao carregar o site estático deve informar o endpoint do API Gateway no primeiro campo e então é só usar :)
+* Ao carregar o site estático em um browser, deve informar o endpoint do API Gateway no primeiro campo e então é só usar :)
+
+![gpt](front.PNG)
 
 
 Este projeto contém o código-fonte e arquivos de suporte para uma aplicação *serverless* que você pode implantar com a SAM CLI. Ele inclui os seguintes arquivos e pastas:
