@@ -5,8 +5,10 @@ Description: >
 
 Resources:
   
- 
-  # S3 Bucket for hosting static content (not configured as website)
+  #############################################################################################################
+  ##  S3 Bucket for hosting static content (not configured as website)
+  #############################################################################################################
+
   StaticSiteBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -17,14 +19,20 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
 
-  # Origin Access Identity for CloudFront to access the S3 bucket
+  #############################################################################################################
+  ##   Origin Access Identity for CloudFront to access the S3 bucket
+  #############################################################################################################
+
   CloudFrontOriginAccessIdentity:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
     Properties:
       CloudFrontOriginAccessIdentityConfig:
         Comment: !Sub 'Access S3 bucket ${StaticSiteBucket} from CloudFront'
 
-  # CloudFront distribution for serving static files from S3
+  #############################################################################################################
+  ##   CloudFront distribution for serving static files from S3
+  #############################################################################################################
+
   StaticSiteCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -53,7 +61,10 @@ Resources:
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
 
-  # Bucket Policy to allow CloudFront to access the S3 bucket
+  #############################################################################################################
+  ##   Bucket Policy to allow CloudFront to access the S3 bucket
+  #############################################################################################################
+
   StaticSiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -67,7 +78,10 @@ Resources:
             Action: s3:GetObject
             Resource: !Sub 'arn:aws:s3:::${StaticSiteBucket}/*'
 
-  # API Gateway REST API
+  #############################################################################################################
+  ##  API Gateway REST API
+  #############################################################################################################
+
   ApiGateway:
     Type: AWS::Serverless::Api
     Properties:
@@ -153,8 +167,10 @@ Resources:
                       method.response.header.Content-Type: "'application/json'"
 
 
-
-  # IAM Role for API Gateway to invoke Lambda function
+  #############################################################################################################
+  ##  IAM Role for API Gateway to invoke Lambda function
+  #############################################################################################################
+ 
   ApiGatewayExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -186,7 +202,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          GENAI_API_KEY: "YOUR_GOOGLE_API_KEY"
+          GENAI_API_KEY: "COLE_AQUI_SUA_GOOGLE_API_KEY"
       Events:
         Api:
           Type: Api

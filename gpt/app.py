@@ -27,7 +27,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 400,
             "headers": {
-                "Access-Control-Allow-Origin": "*",  # Permite requisições de qualquer origem
+                "Access-Control-Allow-Origin": "*", 
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type"
             },
@@ -43,7 +43,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 200,
             "headers": {
-                "Access-Control-Allow-Origin": "*",  # Permite requisições de qualquer origem
+                "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type"
             },
@@ -55,7 +55,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 500,
             "headers": {
-                "Access-Control-Allow-Origin": "*",  # Permite requisições de qualquer origem
+                "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type"
             },
