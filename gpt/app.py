@@ -8,6 +8,11 @@ def lambda_handler(event, context):
     if not api_key:
         return {
             "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",  # Permite requisições de qualquer origem
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            },
             "body": json.dumps({"error": "API key is not set in environment variables"})
         }
 
@@ -17,10 +22,15 @@ def lambda_handler(event, context):
     # Extrair o corpo da requisição e fazer o parsing do JSON
     try:
         body = json.loads(event.get("body", "{}"))
-        prompt = body.get("prompt", "Escreva extamente a mensagem: 'Em que posso ajudar?'")
+        prompt = body.get("prompt", "Escreva exatamente a mensagem: 'Em que posso ajudar?'")
     except json.JSONDecodeError:
         return {
             "statusCode": 400,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",  # Permite requisições de qualquer origem
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            },
             "body": json.dumps({"error": "Invalid JSON in request body"})
         }
 
@@ -32,6 +42,11 @@ def lambda_handler(event, context):
         # Retornar a resposta gerada pela API
         return {
             "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",  # Permite requisições de qualquer origem
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            },
             "body": json.dumps({
                 "message": response.text
             }),
@@ -39,6 +54,11 @@ def lambda_handler(event, context):
     except Exception as e:
         return {
             "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",  # Permite requisições de qualquer origem
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            },
             "body": json.dumps({
                 "error": "Failed to generate content",
                 "details": str(e)
