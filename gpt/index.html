@@ -53,6 +53,23 @@
         h5 {
             text-align: center;
         }
+
+        /* Estilo do spinner */
+        .spinner {
+            display: none;
+            margin: 20px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #009578;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 
@@ -66,27 +83,37 @@
             <textarea id="content" rows="10"></textarea>
             <button onclick="callApi()">Enviar</button>
         </div>
+
+        <!-- Spinner -->
+        <div class="spinner" id="spinner"></div>
+
         <div id="response" class="box">
             <label for="output">Resposta:</label>
             <textarea id="output" rows="10" readonly></textarea>
         </div>
         <h5><i>Observe que, como em todos os aplicativos com tecnologia de IA, os resultados devem ser revisados quanto a precisao e adequacao.</i></h5>
     </div>
+
     <script>
         function callApi() {
             const apiGatewayUrl = document.getElementById('apiGatewayUrl').value;
             const content = document.getElementById('content').value;
-    
+            const spinner = document.getElementById('spinner');
+            const responseBox = document.getElementById('response');
+
+            // Exibir o spinner e ocultar a área de resposta
+            spinner.style.display = 'block';
+            responseBox.style.display = 'none';
+
             if (!apiGatewayUrl) {
                 alert("Please provide the API Gateway URL.");
                 return;
             }
-    
-            // Construindo o corpo do JSON no formato desejado
+
             const requestBody = JSON.stringify({
                 prompt: content
             });
-    
+
             fetch(apiGatewayUrl, {
                 method: 'POST',
                 headers: {
@@ -107,9 +134,14 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert('An error occurred: ' + error);
+            })
+            .finally(() => {
+                // Ocultar o spinner e mostrar a área de resposta novamente
+                spinner.style.display = 'none';
+                responseBox.style.display = 'block';
             });
         }
-    </script>    
+    </script>
 </body>
 
 </html>
